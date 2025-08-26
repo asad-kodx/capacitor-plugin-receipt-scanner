@@ -1,20 +1,96 @@
 <ion-header [translucent]="true">
   <ion-toolbar>
     <ion-title>
-      Blank
+      Document Scanner Demo
     </ion-title>
   </ion-toolbar>
 </ion-header>
 
-<ion-content [fullscreen]="true">
-  <ion-header collapse="condense">
-    <ion-toolbar>
-      <ion-title size="large">Blank</ion-title>
-    </ion-toolbar>
-  </ion-header>
-
-  <div id="container">
-    <strong>Ready to create an app?</strong>
-    <p>Start with Ionic <a target="_blank" rel="noopener noreferrer" href="https://ionicframework.com/docs/components">UI Components</a></p>
+<ion-content [fullscreen]="false">
+  <div style="padding: 20px;">
+    <h2>Document Scanner Plugin</h2>
+    <p>Test the CameraX + ML Kit implementation with auto-capture functionality</p>
+    
+    <!-- Scan Button -->
+    
+    <ion-button 
+      expand="block" 
+      (click)="scanWithAutoCapture()" 
+      color="secondary"
+      [disabled]="isScanning">
+      <ion-icon slot="start" name="camera"></ion-icon>
+      {{ isScanning ? 'Auto-Scanning...' : 'Scan Receipt' }}
+      <ion-spinner slot="end" *ngIf="isScanning"></ion-spinner>
+    </ion-button>
+    
+    <!-- Scan Result Display -->
+    <ion-card *ngIf="scanResult">
+      <ion-card-header>
+        <ion-card-title>
+          <ion-icon [name]="getStatusIcon()" [color]="getStatusColor()"></ion-icon>
+          Scanned Result
+        </ion-card-title>
+      </ion-card-header>
+      
+      <ion-card-content>
+        <!-- Status Information -->
+        <div class="scan-info">
+          <ion-text [color]="getStatusColor()">
+            <p><strong>Status:</strong> {{ scanResult?.status }}</p>
+          </ion-text>
+          <p><strong>Response Type:</strong> {{ scanResult?.responseType }}</p>
+          <p><strong>Timestamp:</strong> {{ scanResult?.timestamp | date:'medium' }}</p>
+        </div>
+        
+        <!-- Image Display -->
+        <div class="image-container" *ngIf="scanResult?.status === 'success' && scanResult?.scannedFile">
+          <h4>Scanned Image:</h4>
+          <ion-img 
+            [src]="getImageSrc()" 
+            alt="Scanned document"
+            class="scanned-image">
+          </ion-img>
+          
+          <!-- Image Details -->
+          <div class="image-details">
+            <p><strong>Data:</strong></p>
+            <div class="data-preview">
+              <ion-text color="medium">
+                <small>{{ scanResult?.responseType === 'Base64' ? 'Base64 length: ' + (scanResult?.scannedFile?.length || 0) + ' chars' : scanResult.scannedFile }}</small>
+              </ion-text>
+            </div>
+          </div>
+        </div>
+        
+        <!-- No Image Message -->
+        <div *ngIf="scanResult?.status !== 'success' || !scanResult?.scannedFile" class="no-image">
+          <ion-text color="medium">
+            <p>No image data available</p>
+            <p *ngIf="scanResult?.status === 'cancel'">Scan was cancelled by user</p>
+            <p *ngIf="scanResult?.status !== 'success' && scanResult?.status !== 'cancel'">Scan completed with error status</p>
+          </ion-text>
+        </div>
+        
+        <!-- Clear Button -->
+        <ion-button 
+          expand="block" 
+          fill="outline" 
+          color="danger" 
+          (click)="clearResult()"
+          class="clear-button">
+          <ion-icon slot="start" name="refresh"></ion-icon>
+          Clear Result
+        </ion-button>
+      </ion-card-content>
+    </ion-card>
   </div>
+  
+  <!-- Toast for notifications -->
+  <ion-toast
+    [isOpen]="showToast"
+    [message]="toastMessage"
+    duration="3000"
+    position="bottom"
+    (didDismiss)="showToast = false">
+  </ion-toast>
 </ion-content>

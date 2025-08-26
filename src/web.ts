@@ -1,10 +1,10 @@
 import { WebPlugin } from '@capacitor/core';
 
-import type { ReceiptScannerPlugin } from './definitions';
+import type { ReceiptScannerPlugin, ScanReceiptOptions, ScanReceiptResponse } from './definitions';
 
 export class ReceiptScannerWeb extends WebPlugin implements ReceiptScannerPlugin {
-  async echo(options: { value: string }): Promise<{ value: string }> {
-    console.log('ECHO', options);
-    return options;
+  async scan(options: ScanReceiptOptions): Promise<ScanReceiptResponse> {
+    console.log('scan', options);
+    throw this.unimplemented('Not implemented on web.');
   }
 }

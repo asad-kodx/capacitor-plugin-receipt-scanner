@@ -1,3 +1,51 @@
 export interface ReceiptScannerPlugin {
-  echo(options: { value: string }): Promise<{ value: string }>;
+  scan(options: ScanReceiptOptions): Promise<ScanReceiptResponse>
+}
+
+export interface ScanReceiptOptions {
+  /**
+   * The response comes back in this format on success. It can be the document
+   * scan image file paths or base64 images.
+   * @default: ResponseType.ImageFilePath
+   */
+  responseType?: ResponseType
+}
+
+export enum ResponseType {
+  /**
+   * Use this response type if you want document scan returned as base64 images.
+   */
+  Base64 = 'base64',
+
+  /**
+   * Use this response type if you want document scan returned as inmage file paths.
+   */
+  ImageFilePath = 'imageFilePath'
+}
+export interface ScanReceiptResponse {
+  /**
+   * This is an array with either file path or base64 for the
+   * document scan.
+   */
+  scannedFile?: string
+
+  /**
+   * The status lets you know if the document scan completes successfully,
+   * or if the user cancels before completing the document scan.
+   */
+  status?: ScanReceiptResponseStatus
+}
+
+export enum ScanReceiptResponseStatus {
+  /**
+   * The status comes back as success if the document scan completes
+   * successfully.
+   */
+  Success = 'success',
+
+  /**
+   * The status comes back as cancel if the user closes out of the camera
+   * before completing the document scan.
+   */
+  Cancel = 'cancel'
 }
